@@ -2,17 +2,16 @@
 
 window.addEventListener('DOMContentLoaded', (event) => {    
 
-    var currentColor = 'black'
+    var currentColor = 'black'  // default start color
+    var size = 10;  // pixel canvas size of each cell
+    var sizeTable = 50 // size of the table h x w
+    var table = document.createElement('table') // ref to the table itself
 
-    // make the 32 by 32 table
-    var size = 10;
-    var table = document.createElement('table')
-
-
-    for (let i=0; i<32; i++) {
+    /* make the 32 by 32 table */
+    for (let i=0; i<sizeTable; i++) {
         let row = document.createElement('tr')     
         row.style = 'margin: 0px; padding: 0px;'   
-        for (let j=0;j<32; j++) {
+        for (let j=0;j<sizeTable; j++) {
             let cell = document.createElement('td')
             cell.style = `width: ${size}px; height: ${size}px; border: 1px solid black; margin: 0px;`
             
@@ -25,23 +24,24 @@ window.addEventListener('DOMContentLoaded', (event) => {
         table.appendChild(row)
     }
 
+    // style the table itself
     table.style = 'margin: 0px; padding: 0px; border: 0px solid black;border-collapse: collapse; border-spacing: 0; '
     table.addEventListener('mousedown', (event) => {
-
-        // color the cell
+        // color the cell on its inital mousedown location
         document.getElementById(event.target.id).style = `background-color: ${currentColor};`
     })
     table.addEventListener('mousemove', (event) => {
         if (event.buttons == 1) {
-
-            // color the cell
+            // color the cell with the primary mouse button down,
+            //  as it drags into other cells.
             document.getElementById(event.srcElement.id).style = `background-color: ${currentColor};`
         }
     })
     
+    // add the whole table to the DOM
     document.querySelector("#editor").appendChild(table)
 
-    // make some basic colors available in the pallete
+    /* make some basic colors available in the pallete */
     var colorTable = document.createElement('table')
     let colorRow = document.createElement('tr')     
     colorRow.style = 'margin: 0px; padding: 0px;'
@@ -82,14 +82,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
     })
 
     // add the color table to the DOM
-    document.querySelector("#colors").appendChild(colorTable)
-    
+    document.querySelector("#colors").appendChild(colorTable)    
 
+    /* define a local func for clearing/resetting the table */
     var clearTable = () => {
-        for (let i=0;i<32;i++) {
-            for (let j=0;j<32;j++) {
+        for (let i=0;i<sizeTable;i++) {
+            for (let j=0;j<sizeTable;j++) {
                 document.getElementById(`${i}-${j}`).style = `width: ${size}px; height: ${size}px; border: 1px solid black; margin: 0px;`
-                
             }
         }
     }
@@ -105,6 +104,46 @@ window.addEventListener('DOMContentLoaded', (event) => {
     })
     document.body.appendChild(clearButton);
 
+    // save button
+    var saveButton = document.createElement('button')
+    saveButton.innerText = 'Save!'
+    saveButton.addEventListener('click', (event) => {
+        // stringify and stash!
+        // grab each cells background color into a 
+        // giant data structure (object), key'ed by the cell's ID
+        // which is also the coordinate!!
+        var pixels = {}
+
+        for (let i=0;i<sizeTable;i++) {
+            for (let j=0;j<sizeTable;j++) {
+                pixels[`${i}-${j}`] = document.getElementById(`${i}-${j}`).style['background-color']
+            }
+        }
+
+        localStorage.setItem('savedPic', JSON.stringify(pixels))
+    })
+    document.body.appendChild(saveButton);
+
+    // restore button
+    var restoreButton = document.createElement('button')
+    restoreButton.innerText = 'Restore Last!'
+    restoreButton.addEventListener('click', (event) => {
+        
+        var pixels = localStorage.getItem('savedPic')
+        console.log(pixels)
+        if (pixels != null) {
+
+            console.log("sdfdsf")
+            pixels = JSON.parse(pixels);
+
+            for (var key in pixels) {
+                document.getElementById(key).style['background-color'] = pixels[key]
+            }
+
+        }
+    })
+    document.body.appendChild(restoreButton);
+
     // custom color button
     var customColorButton = document.createElement('input')
     customColorButton.setAttribute('type', 'color')
@@ -118,4 +157,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     })
     document.body.appendChild(customColorButton);
 
+    
+
+    
 });
