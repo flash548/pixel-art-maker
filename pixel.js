@@ -3,6 +3,7 @@
 window.addEventListener('DOMContentLoaded', (event) => {    
 
     var currentColor = 'black'  // default start color
+    var bucketMode = false; // bucket vs pixel mode
     var size = 10;  // pixel canvas size of each cell
     var sizeTable = 50 // size of the table h x w
     var table = document.createElement('table') // ref to the table itself
@@ -28,10 +29,39 @@ window.addEventListener('DOMContentLoaded', (event) => {
     table.style = 'margin: 0px; padding: 0px; border: 0px solid black;border-collapse: collapse; border-spacing: 0; '
     table.addEventListener('mousedown', (event) => {
         // color the cell on its inital mousedown location
-        document.getElementById(event.target.id).style = `background-color: ${currentColor};`
+        if (!bucketMode) {
+            document.getElementById(event.target.id).style = `background-color: ${currentColor};`
+        }
+        else {
+            // bucket fill from this point - fun
+                        
+        }
+
     })
+    table.addEventListener('touchstart', (event) => {
+        // color the cell on its inital mousedown location
+        if (!bucketMode) {
+            document.getElementById(event.target.id).style = `background-color: ${currentColor};`
+        }
+        else {
+            // bucket fill from this point - fun
+                        
+        }
+
+    })
+
     table.addEventListener('mousemove', (event) => {
-        if (event.buttons == 1) {
+
+        if (event.buttons == 1 && !bucketMode) {
+            // color the cell with the primary mouse button down,
+            //  as it drags into other cells.
+            document.getElementById(event.srcElement.id).style = `background-color: ${currentColor};`
+        }
+    })
+
+    table.addEventListener('touchmove', (event) => {
+
+        if (event.buttons == 1 && !bucketMode) {
             // color the cell with the primary mouse button down,
             //  as it drags into other cells.
             document.getElementById(event.srcElement.id).style = `background-color: ${currentColor};`
@@ -80,6 +110,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
         currentColor = event.target.id;
         document.getElementById('currColor').style['background-color'] = `${currentColor}`
     })
+
+    // add the bucket fill tool
+    let bucketToolCell = document.createElement('td')
+    bucketToolCell.id = 'bucketTool'
+    bucketToolCell.innerText= "Bucket Tool?"
+    let bucketCheckBox = document.createElement('input')
+    bucketCheckBox.setAttribute('type', 'checkbox')
+    bucketCheckBox.id = 'bucketToolCheckBox'
+    bucketToolCell.appendChild(bucketCheckBox)
+    colorRow.appendChild(bucketToolCell)
 
     // add the color table to the DOM
     document.querySelector("#colors").appendChild(colorTable)    
