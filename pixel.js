@@ -25,47 +25,74 @@ window.addEventListener('DOMContentLoaded', (event) => {
         table.appendChild(row)
     }
 
+    /*
+    Flood-fill (node, target-color, replacement-color):
+    1. If target-color is equal to replacement-color, return.
+    2. ElseIf the color of node is not equal to target-color, return.
+    3. Else Set the color of node to replacement-color.
+    4. Perform Flood-fill (one step to the south of node, target-color, replacement-color).
+        Perform Flood-fill (one step to the north of node, target-color, replacement-color).
+        Perform Flood-fill (one step to the west of node, target-color, replacement-color).
+        Perform Flood-fill (one step to the east of node, target-color, replacement-color).
+    5. Return.
+    */
+    var floodFill = (x, y, targetColor, replColor) => {
+        console.log(currentColor); console.log(targetColor); console.log(replColor)
+        if ((x > size-1) || (y > size-1)) return; // table border
+        if ((x < 0) || (y < 0)) return; // table border
+
+        if (targetColor == replColor) return;        
+        else if ((document.getElementById(`${x}-${y}`))['background-color'] !== targetColor) return;
+        else {
+            (document.getElementById(`${x}-${y}`))['background-color'] = replColor;
+            floodFill(x+1, y, targetColor, replColor)
+            floodFill(x-1, y, targetColor, replColor)
+            floodFill(x, y+1, targetColor, replColor)
+            floodFill(x, y-1, targetColor, replColor)
+        }
+    }
+
+    // mouse down and touch start direct to here.
+    var downEvent = (event) => {
+        // color the cell on its inital mousedown location
+        if (!bucketMode) {
+            document.getElementById(event.target.id).style = `background-color: ${currentColor};`
+        }
+        else {
+            // bucket fill from this point - fun
+            let x = Number(event.target.id.split('-')[0])
+            let y = Number(event.target.id.split('-')[1])
+            floodFill(x, y, event.target['background-color'], currentColor);             
+        }
+    }
+
+    // mouse move and touch move direct to here
+    var moveEvent = (event) => {
+        if (event.buttons == 1 && !bucketMode) {
+            // color the cell with the primary mouse button down,
+            //  as it drags into other cells.
+            document.getElementById(event.srcElement.id).style = `background-color: ${currentColor};`
+        }
+    }
+
     // style the table itself
     table.style = 'margin: 0px; padding: 0px; border: 0px solid black;border-collapse: collapse; border-spacing: 0; '
     table.addEventListener('mousedown', (event) => {
-        // color the cell on its inital mousedown location
-        if (!bucketMode) {
-            document.getElementById(event.target.id).style = `background-color: ${currentColor};`
-        }
-        else {
-            // bucket fill from this point - fun
-                        
-        }
-
+        downEvent(event);
     })
-    table.addEventListener('touchstart', (event) => {
-        // color the cell on its inital mousedown location
-        if (!bucketMode) {
-            document.getElementById(event.target.id).style = `background-color: ${currentColor};`
-        }
-        else {
-            // bucket fill from this point - fun
-                        
-        }
 
+    // for mobile devices....
+    table.addEventListener('touchstart', (event) => {
+        downEvent(event);
     })
 
     table.addEventListener('mousemove', (event) => {
-
-        if (event.buttons == 1 && !bucketMode) {
-            // color the cell with the primary mouse button down,
-            //  as it drags into other cells.
-            document.getElementById(event.srcElement.id).style = `background-color: ${currentColor};`
-        }
+        moveEvent(event);        
     })
 
+    // for mobile devices....
     table.addEventListener('touchmove', (event) => {
-
-        if (event.buttons == 1 && !bucketMode) {
-            // color the cell with the primary mouse button down,
-            //  as it drags into other cells.
-            document.getElementById(event.srcElement.id).style = `background-color: ${currentColor};`
-        }
+        moveEvent(event);
     })
     
     // add the whole table to the DOM
@@ -114,10 +141,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
     // add the bucket fill tool
     let bucketToolCell = document.createElement('td')
     bucketToolCell.id = 'bucketTool'
-    bucketToolCell.innerText= "Bucket Tool?"
+    bucketToolCell.innerHTML= "<s>Bucket Tool?</s>"
     let bucketCheckBox = document.createElement('input')
     bucketCheckBox.setAttribute('type', 'checkbox')
     bucketCheckBox.id = 'bucketToolCheckBox'
+    bucketCheckBox.disabled = true;
+    bucketCheckBox.addEventListener('click', (event) => {
+        bucketMode = event.target.checked
+    })
     bucketToolCell.appendChild(bucketCheckBox)
     colorRow.appendChild(bucketToolCell)
 
