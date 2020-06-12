@@ -2,11 +2,13 @@
 
 window.addEventListener('DOMContentLoaded', (event) => {    
 
-    let currentColor = 'black'
+    var currentColor = 'black'
 
     // make the 32 by 32 table
-    let size = 10;
-    let table = document.createElement('table')
+    var size = 10;
+    var table = document.createElement('table')
+
+
     for (let i=0; i<32; i++) {
         let row = document.createElement('tr')     
         row.style = 'margin: 0px; padding: 0px;'   
@@ -40,7 +42,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     document.querySelector("#editor").appendChild(table)
 
     // make some basic colors available in the pallete
-    let colorTable = document.createElement('table')
+    var colorTable = document.createElement('table')
     let colorRow = document.createElement('tr')     
     colorRow.style = 'margin: 0px; padding: 0px;'
     let colors = ['green', 'red', 'yellow', 'brown', 'black', 'white', 'blue',
@@ -83,5 +85,37 @@ window.addEventListener('DOMContentLoaded', (event) => {
     document.querySelector("#colors").appendChild(colorTable)
     
 
+    var clearTable = () => {
+        for (let i=0;i<32;i++) {
+            for (let j=0;j<32;j++) {
+                document.getElementById(`${i}-${j}`).style = `width: ${size}px; height: ${size}px; border: 1px solid black; margin: 0px;`
+                
+            }
+        }
+    }
+
+
+    /* now we add the custom controls. */
+
+    // clear button
+    var clearButton = document.createElement('button')
+    clearButton.innerText = 'Clear!'
+    clearButton.addEventListener('click', (event) => {
+        clearTable();
+    })
+    document.body.appendChild(clearButton);
+
+    // custom color button
+    var customColorButton = document.createElement('input')
+    customColorButton.setAttribute('type', 'color')
+    var label = document.createElement('label')
+    label.innerText = "Choose Color..."
+    document.body.appendChild(label)
+    customColorButton.addEventListener('change', (event) => {
+        // update current color
+        currentColor = event.target.value;
+        document.getElementById('currColor').style['background-color'] = `${currentColor}`
+    })
+    document.body.appendChild(customColorButton);
 
 });
